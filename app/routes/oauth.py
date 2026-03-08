@@ -85,4 +85,7 @@ def google_callback():
         }), 200
 
     except Exception as e:
+        import traceback
+        print(f"OAuth error: {str(e)}")
+        print(traceback.format_exc())
         return jsonify({"error": f"OAuth failed: {str(e)}"}), 400
