@@ -21,7 +21,8 @@ def init_oauth(app):
 
 @oauth_bp.route("/google", methods=["GET"])
 def google_login():
-    redirect_uri = "http://localhost:5000/auth/google/callback"
+    # redirect_uri = "http://localhost:5000/auth/google/callback"
+    redirect_uri = "https://flask-auth-service-production.up.railway.app/auth/google/callback"
     return oauth.google.authorize_redirect(redirect_uri)
 
 

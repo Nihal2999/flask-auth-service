@@ -16,6 +16,7 @@ class Config:
     SESSION_USE_SIGNER = True
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = "None"
+    WTF_CSRF_ENABLED = False
 
 class DevelopmentConfig(Config):
     DEBUG = True
