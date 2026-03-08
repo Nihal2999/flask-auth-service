@@ -35,9 +35,10 @@ def google_login():
 @oauth_bp.route("/google/callback", methods=["GET"])
 def google_callback():
     try:
-        token = oauth.google.authorize_access_token(
-            state=None
-        )
+        from flask import session
+        session.pop('_state_google_' + request.args.get('state', ''), None)
+        
+        token = oauth.google.authorize_access_token()
         user_info = token.get("userinfo")
 
         if not user_info:

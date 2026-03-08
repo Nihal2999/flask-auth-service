@@ -19,6 +19,7 @@ def create_app(config_name="default"):
 
     # Configure Redis session
     app.config["SESSION_REDIS"] = redis.from_url(app.config["REDIS_URL"])
+    app.config["AUTHLIB_INSECURE_TRANSPORT"] = "true"
 
     # Initialize extensions
     db.init_app(app)
