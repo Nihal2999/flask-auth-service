@@ -1,11 +1,9 @@
 services:
   postgres:
     image: postgres:15
-    container_name: flask_auth_postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: flask_auth_db
+    container_name: flask_auth_db
+    env_file:
+      - .env
     ports:
       - "5432:5432"
     volumes:
@@ -32,21 +30,15 @@ services:
     container_name: flask_auth_app
     ports:
       - "5000:5000"
-    environment:
-      - FLASK_ENV=development
-      - DATABASE_URL=postgresql://postgres:password@postgres:5432/flask_auth_db
-      - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=your-super-secret-key-change-this
-      - JWT_SECRET_KEY=your-jwt-secret-key-change-this
-      - ACCESS_TOKEN_EXPIRE_MINUTES=15
-      - REFRESH_TOKEN_EXPIRE_DAYS=7
+    env_file:
+      - .env 
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     command: >
-      sh -c "flask db init || true && flask db migrate -m 'migration' || true && flask db upgrade && python run.py"
+      sh -c "flask db init || true && flask db migrate -m 'migration' || true && flask db upgrade && gunicorn --bind 0.0.0.0:5000 --workers 2 run:app"
 
 volumes:
   postgres_data:

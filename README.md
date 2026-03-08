@@ -13,6 +13,9 @@ A production-ready Authentication Microservice built with Flask, featuring JWT a
 ## 🔗 Live Demo
 **Base URL:** `https://flask-auth-service-production.up.railway.app`
 
+✅ All endpoints tested and working
+✅ Google OAuth2 verified
+✅ PostgreSQL + Redis on Railway
 ---
 
 ## 🏗️ Architecture
@@ -193,14 +196,14 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
 ```bash
 curl -X POST https://flask-auth-service-production.up.railway.app/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"username": "nihal", "email": "nihal@test.com", "password": "Test@1234"}'
+  -d '{"username": "user", "email": "user@test.com", "password": "Test@123"}'
 ```
 
 ### Login
 ```bash
 curl -X POST https://flask-auth-service-production.up.railway.app/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "nihal@test.com", "password": "Test@1234"}'
+  -d '{"email": "user@test.com", "password": "Test@123"}'
 ```
 
 ### Get Profile
@@ -214,6 +217,14 @@ curl -X GET https://flask-auth-service-production.up.railway.app/auth/me \
 curl -X POST https://flask-auth-service-production.up.railway.app/auth/refresh-token \
   -H "Content-Type: application/json" \
   -d '{"refresh_token": "YOUR_REFRESH_TOKEN"}'
+```
+
+### OAuth2 Google Login
+Open in browser (not Postman):
+```bash
+curl -X GET http://localhost:5000/auth/google
+  → Redirects to Google login
+  → Returns JWT tokens on success
 ```
 
 ---
