@@ -15,29 +15,19 @@ def init_oauth(app):
         client_id=os.getenv("GOOGLE_CLIENT_ID"),
         client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
         server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-        client_kwargs={
-            "scope": "openid email profile",
-            "code_challenge_method": None
-        }
+        client_kwargs={"scope": "openid email profile"}
     )
 
 
 @oauth_bp.route("/google", methods=["GET"])
 def google_login():
-    redirect_uri = "https://flask-auth-service-production.up.railway.app/auth/google/callback"
-    return oauth.google.authorize_redirect(
-        redirect_uri,
-        _external=True,
-        nonce=None
-    )
+    redirect_uri = "http://localhost:5000/auth/google/callback"
+    return oauth.google.authorize_redirect(redirect_uri)
 
 
 @oauth_bp.route("/google/callback", methods=["GET"])
 def google_callback():
     try:
-        from flask import session
-        session.pop('_state_google_' + request.args.get('state', ''), None)
-        
         token = oauth.google.authorize_access_token()
         user_info = token.get("userinfo")
 
@@ -48,27 +38,33 @@ def google_callback():
         name = user_info.get("name", email.split("@")[0])
         provider_id = user_info["sub"]
 
+        # Check if OAuth account exists
         oauth_account = OAuthAccount.query.filter_by(
             provider="google",
             provider_id=provider_id
         ).first()
 
         if oauth_account:
+            # Existing OAuth user — just login
             user = oauth_account.user
         else:
+            # Check if email already registered normally
             user = User.query.filter_by(email=email).first()
+
             if not user:
+                # Create new user
                 user = User(
                     username=name.replace(" ", "_").lower(),
                     email=email,
                     password_hash=None,
                     role="user",
                     is_active=True,
-                    is_verified=True
+                    is_verified=True  # Google already verified the email
                 )
                 db.session.add(user)
                 db.session.flush()
 
+            # Link OAuth account
             oauth_account = OAuthAccount(
                 user_id=user.id,
                 provider="google",
@@ -77,6 +73,7 @@ def google_callback():
             db.session.add(oauth_account)
             db.session.commit()
 
+        # Generate tokens
         access_token = generate_access_token(user.id, user.email, user.role)
         refresh_token = generate_refresh_token(user.id, user.email, user.role)
 
@@ -88,6 +85,4 @@ def google_callback():
         }), 200
 
     except Exception as e:
-        import traceback
-        print(traceback.format_exc())
         return jsonify({"error": f"OAuth failed: {str(e)}"}), 400
