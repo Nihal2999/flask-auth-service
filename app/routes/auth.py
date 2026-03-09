@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 from .. import limiter
 from ..models.user import User
+from ..services.auth_service import update_user
+from ..services.auth_service import delete_user
 from ..services.token_service import blacklist_token
 from ..utils.decorators import token_required
 from ..middleware.rate_limit import auth_limit, password_limit
@@ -85,7 +87,6 @@ def logout():
 @auth_bp.route("/me", methods=["GET"])
 @token_required
 def get_me():
-    from ..models.user import User
     user = User.query.get(request.current_user["user_id"])
     if not user:
         return jsonify({"error": "User not found"}), 404
@@ -95,7 +96,6 @@ def get_me():
 @auth_bp.route("/me", methods=["PUT"])
 @token_required
 def update_me():
-    from ..services.auth_service import update_user
     data = request.get_json()
     user, error = update_user(request.current_user["user_id"], data)
     if error:
@@ -106,7 +106,6 @@ def update_me():
 @auth_bp.route("/me", methods=["DELETE"])
 @token_required
 def delete_me():
-    from ..services.auth_service import delete_user
     success, error = delete_user(request.current_user["user_id"])
     if error:
         return jsonify({"error": error}), 400

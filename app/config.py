@@ -11,12 +11,7 @@ class Config:
     ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 15))
     REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7))
     REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-    # SESSION_TYPE = "redis"
-    # SESSION_PERMANENT = False
-    # SESSION_USE_SIGNER = True
-    # SESSION_COOKIE_SECURE = True
-    # SESSION_COOKIE_SAMESITE = "None"
-    # WTF_CSRF_ENABLED = False
+    SESSION_TYPE = "redis"
     MAIL_SERVER = os.getenv("MAIL_SERVER", "smtp.gmail.com")
     MAIL_PORT = int(os.getenv("MAIL_PORT", 587))
     MAIL_USE_TLS = True
