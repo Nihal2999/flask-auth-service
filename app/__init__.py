@@ -6,6 +6,7 @@ from flask_session import Session
 from .models.user import db
 from .config import config
 from .routes.oauth import init_oauth
+from .services.email_service import mail
 import redis
 
 migrate = Migrate()
@@ -26,6 +27,7 @@ def create_app(config_name="default"):
     migrate.init_app(app, db)
     limiter.init_app(app)
     Session(app)
+    mail.init_app(app)
     init_oauth(app)
 
     # Register blueprints

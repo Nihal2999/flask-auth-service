@@ -1,8 +1,10 @@
 from flask import Blueprint, request, jsonify
 from .. import limiter
+from ..models.user import User
 from ..services.token_service import blacklist_token
 from ..utils.decorators import token_required
 from ..middleware.rate_limit import auth_limit, password_limit
+from ..services.email_service import send_password_reset_email, send_welcome_email
 from ..services.auth_service import (
     register_user, login_user, create_password_reset_token, reset_password
 )
@@ -32,6 +34,8 @@ def register():
 
     if error:
         return jsonify({"error": error}), 400
+    
+    send_welcome_email(data["email"], data["username"])
 
     return jsonify({
         "message": "User registered successfully",
@@ -120,10 +124,11 @@ def forgot_password():
     if error:
         return jsonify({"error": error}), 400
 
-    # In production this token would be emailed
-    # For now return it directly for testing
+    user = User.query.filter_by(email=data["email"]).first()
+    email_sent = send_password_reset_email(data["email"], user.username, token)
+    
     return jsonify({
-        "message": "Password reset token generated",
+        "message": "Password reset email sent" if email_sent else "Password reset token generated",
         "reset_token": token
     }), 200
 
