@@ -44,6 +44,7 @@ Flask App (Gunicorn)
 - **Gunicorn** — Production WSGI server
 - **Docker** — Fully containerized with Docker Compose
 - **CI/CD** — GitHub Actions for automated testing and DockerHub push
+- **Email Notifications** — Welcome email on registration, password reset via Gmail SMTP
 
 ---
 
@@ -118,6 +119,7 @@ flask-auth-service/
 |---|---|---|---|
 | POST | `/auth/forgot-password` | Generate reset token | No |
 | POST | `/auth/reset-password` | Reset password with token | No |
+| POST | `/auth/forgot-password` | Send password reset email | No |
 
 ### OAuth2
 | Method | Endpoint | Description |
@@ -170,6 +172,25 @@ flask db upgrade
 
 # Start app
 python run.py
+```
+
+---
+
+## 📧 Email Configuration
+
+This service uses Gmail SMTP for transactional emails.
+
+To configure:
+1. Enable 2-Step Verification on your Google Account
+2. Generate an App Password: Google Account → Security → App Passwords
+3. Add to your `.env`:
+```env
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your@gmail.com
+MAIL_PASSWORD=your-16-char-app-password
+MAIL_DEFAULT_SENDER=your@gmail.com
+FRONTEND_URL=http://localhost:5000
 ```
 
 ---
